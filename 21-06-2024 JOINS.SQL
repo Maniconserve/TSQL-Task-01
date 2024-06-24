@@ -62,6 +62,24 @@ JOIN
 JOIN 
     borrowers br ON b.book_id = br.book_id;
 
+/*University Enrollment:
+There are tables students, courses, enrollments, and grades.
+ 
+students table: student_id, student_name, student_major
+courses table: course_id, course_name, course_department
+enrollments table: enrollment_id, student_id, course_id, enrollment_date
+grades table: grade_id, enrollment_id, grade_value
+Write a SQL query to calculate the average grade for each course.*/
+
+SELECT c.course_name, AVG(g.grade_value) AS Course_Avg
+FROM
+	courses c
+JOIN
+	enrollments e ON e.course_id = c.course_id
+JOIN
+	grades g ON g.enrollment_id = e.enrollment_id
+GROUP BY 
+c.course_name;
 
 /*E-commerce Analysis:
 You have tables customers, orders, and products.
