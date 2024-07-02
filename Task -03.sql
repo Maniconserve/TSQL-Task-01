@@ -148,31 +148,13 @@ FROM
 
 /*5. Write a query to list out all the employees where any of the words (Excluding Initials) in the Name starts and ends with the same
 character. (Assume there are not more than 5 words in any name )*/
-WITH SplitNames AS (
-    SELECT
-        Emp_ID,
-        Emp_Name,
-        LTRIM(RTRIM(SUBSTRING(Emp_Name, 1, CHARINDEX(' ', Emp_Name + ' ') - 1))) AS Word1,
-        LTRIM(RTRIM(SUBSTRING(Emp_Name, CHARINDEX(' ', Emp_Name + ' ') + 1, CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ') + 1) - CHARINDEX(' ', Emp_Name + ' ') - 1))) AS Word2,
-        LTRIM(RTRIM(SUBSTRING(Emp_Name, CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ') + 1) + 1, CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ') + 1) + 1) - CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ') + 1) - 1))) AS Word3,
-        LTRIM(RTRIM(SUBSTRING(Emp_Name, CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ') + 1) + 1) + 1, CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ') + 1) + 1) + 1) - CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ') + 1) + 1) - 1))) AS Word4,
-        LTRIM(RTRIM(SUBSTRING(Emp_Name, CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ', CHARINDEX(' ', Emp_Name + ' ') + 1) + 1) + 1) + 1, LEN(Emp_Name)))) AS Word5
-    FROM Employees
-)
-SELECT
-    Emp_ID,
-    Emp_Name
-FROM
-    SplitNames
-WHERE
-    (
-        LEN(Word1) > 1 AND LEFT(Word1, 1) = RIGHT(Word1, 1)
-    ) OR (
-        LEN(Word2) > 1 AND LEFT(Word2, 1) = RIGHT(Word2, 1)
-    ) OR (
-        LEN(Word3) > 1 AND LEFT(Word3, 1) = RIGHT(Word3, 1)
-    ) OR (
-        LEN(Word4) > 1 AND LEFT(Word4, 1) = RIGHT(Word4, 1)
-    ) OR (
-        LEN(Word5) > 1 AND LEFT(Word5, 1) = RIGHT(Word5, 1)
-    );
+SELECT e.*
+FROM Employees e
+WHERE EXISTS (
+    SELECT 1
+    FROM (
+        SELECT value AS word
+        FROM STRING_SPLIT(e.name,' ')
+    ) AS words
+    WHERE LEN(words.word) > 1 AND LEFT(words.word, 1) = RIGHT(words.word, 1)  
+);
